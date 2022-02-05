@@ -1,0 +1,5 @@
+django>=2.2
+djangorestframework>=3.10
+djangorestframework-simplejwt>=5.0
+tox>=3.24
+wheel>=0.37
