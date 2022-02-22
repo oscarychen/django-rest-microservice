@@ -1,18 +1,57 @@
 from django.conf import settings
 from django.test.signals import setting_changed
+from django.utils.module_loading import import_string
 
 USER_SETTINGS = getattr(settings, "REST_FRAMEWORK_MICROSERVICE", None)
 
 DEFAULTS = {
-    "TOKEN_CUSTOM_USER_CLAIMS":  [],
-
+    "REFRESH_COOKIE_NAME": "refresh_cookie",
+    "IDP": {
+        "PROVIDER": "aws",
+        "USER_POOL": "us-west-2_abcdefg",
+        "CLIENT_ID": "abcdefg",
+    },
+    "CUSTOM_TOKEN_USER_ATTRIBUTES": [],
+    "CUSTOM_TOKEN_CALLABLE_ATTRIBUTES": [],
+    "COOKIE_SALT": "extra",
+    "USER_SERIALIZER_CLASS": None,
 }
+
+IMPORT_STRINGS = [
+    'USER_SERIALIZER_CLASS'
+]
+
+
+def perform_import(val, setting_name):
+    """
+    If the given setting is a string import notation,
+    then perform the necessary import or imports.
+    """
+    if val is None:
+        return None
+    elif isinstance(val, str):
+        return import_from_string(val, setting_name)
+    elif isinstance(val, (list, tuple)):
+        return [import_from_string(item, setting_name) for item in val]
+    return val
+
+
+def import_from_string(val, setting_name):
+    """
+    Attempt to import a class from a string representation.
+    """
+    try:
+        return import_string(val)
+    except ImportError as e:
+        msg = "Could not import '%s' for API setting '%s'. %s: %s." % (val, setting_name, e.__class__.__name__, e)
+        raise ImportError(msg)
 
 
 class RestFrameworkMicroserviceSettings:
-    def __init__(self, user_settings=None, defaults=None):
+    def __init__(self, user_settings=None, defaults=None, import_strings=None):
         self._user_settings = user_settings or {}
         self.defaults = defaults or DEFAULTS
+        self.import_strings = import_strings or IMPORT_STRINGS
         self._cached_attrs = set()
 
     @property
@@ -23,7 +62,7 @@ class RestFrameworkMicroserviceSettings:
 
     def __getattr__(self, attr):
 
-        # check the setting is accepted
+        # check the setting is accepted attribute
         if attr not in self.defaults:
             raise AttributeError(f"Invalid REST_FRAMEWORK_MICROSERVICE setting: {attr}")
 
@@ -32,6 +71,10 @@ class RestFrameworkMicroserviceSettings:
             val = self.user_settings[attr]
         except KeyError:
             val = self.defaults[attr]
+
+        # Coerce import strings into classes
+        if attr in self.import_strings:
+            val = perform_import(val, attr)
 
         self._cached_attrs.add(attr)
         setattr(self, attr, val)
@@ -45,14 +88,14 @@ class RestFrameworkMicroserviceSettings:
             delattr(self, "_user_settings")
 
 
-drf_stripe_settings = DrfStripeSettings(USER_SETTINGS, DEFAULTS)
+rest_microservice_settings = RestFrameworkMicroserviceSettings(USER_SETTINGS, DEFAULTS)
 
 
 def reload_rest_framework_microservice_settings(*args, **kwargs):
     print("Reloading rest_framework_microservice settings")
     setting = kwargs["setting"]
     if setting == "REST_FRAMEWORK_MICROSERVICE":
-        drf_stripe_settings.reload()
+        rest_microservice_settings.reload()
 
 
 setting_changed.connect(reload_rest_framework_microservice_settings)
