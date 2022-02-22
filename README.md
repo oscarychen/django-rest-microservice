@@ -1,9 +1,9 @@
 # django-rest-microservice
 
 This package is built on the 
-(djangorestframework-simplejwt)[https://github.com/jazzband/djangorestframework-simplejwt] package, which provides
-some JWT authentication mechanisms.
-This package adds the following features:
+[djangorestframework-simplejwt](https://github.com/jazzband/djangorestframework-simplejwt) package, which provides
+some JWT authentication mechanisms with [Django REST framework](https://github.com/encode/django-rest-framework).
+This package offers the following features:
 - Provides refresh cookie in HttpOnly cookie, and access token in response body, for better security 
 when implemented properly with SPA.
 - Provides an easier approach to customizing token claims than the standard mechanism described in 
@@ -11,6 +11,29 @@ djangorestframework-simplejwt documentation.
 - Provides a mechanism for authentication with a third-party IDP, before issuing internal JWT to your users.
 - Currently, supports authentication with AWS Cognito using OAuth 2 Code Grant with PKCE for best security practices.
 
+Installation
+============
+Install package to environment:
+```commandline
+pip install django-rest-microservice
+```
+In the main urls.py, include the default package url routes:
+```python
+from django.urls import path, include
+
+urlpatterns = [
+    path("auth/", include("rest_framework_microservice.urls"))
+]
+```
+
+In Django settings, include the following:
+```python
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTTokenUserAuthentication',
+    )
+}
+```
 
 Settings
 ========
@@ -93,4 +116,27 @@ def get_user_subscribed_services(user):
   return user.subscribed_services
 
 ```
+If you are using `djangorestframework-simplejwt` version <= 5.0.0, you will also need to extend the 
+`rest_framework_simplejwt.models.TokenUser` to include the additional claims. This is only applicable when using
+[older versions](https://github.com/jazzband/djangorestframework-simplejwt/pull/528/).
 
+```python
+from functools import cached_property
+from rest_framework_simplejwt.models import TokenUser
+
+class CustomTokenUser(TokenUser):
+    """
+    Extend TokenUser and adds custom attributes to be pulled from TokenUser.
+    This class should be specified in Django settings SIMPLE_JWT.TOKEN_USER_CLASS
+    """
+
+    @cached_property
+    def first_name(self):
+        return self.token.get('first_name', None)
+```
+and include the following Django setting:
+```python
+SIMPLE_JWT = {
+    'TOKEN_USER_CLASS': 'microservice.models.CustomTokenUser'
+}
+```
