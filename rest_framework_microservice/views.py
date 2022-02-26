@@ -50,6 +50,9 @@ class RefreshTokenUsingCookieMixin:
         except KeyError:
             raise InvalidToken()
 
+        if csrf_from_cookie is None or csrf_from_body is None:
+            raise InvalidToken()
+
         if csrf._does_token_match(csrf_from_cookie, csrf_from_body) is False:
             raise InvalidToken()
 
