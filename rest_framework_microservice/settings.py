@@ -6,6 +6,7 @@ USER_SETTINGS = getattr(settings, "REST_FRAMEWORK_MICROSERVICE", None)
 
 DEFAULTS = {
     "REFRESH_COOKIE_NAME": "refresh_cookie",
+    "REFRESH_COOKIE_PATH": "/auth",
     "IDP": {
         "PROVIDER": "aws",
         "USER_POOL": "us-west-2_abcdefg",

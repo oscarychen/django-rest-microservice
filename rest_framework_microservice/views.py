@@ -30,14 +30,14 @@ class RefreshTokenUsingCookieMixin:
                                    httponly=True,
                                    samesite='strict',
                                    secure=not settings.DEBUG,
-                                   path="/jwt")
+                                   path=rest_microservice_settings.REFRESH_COOKIE_PATH)
         # set refresh token
         response.set_signed_cookie(key=rest_microservice_settings.REFRESH_COOKIE_NAME,
                                    value=refresh_token,
                                    salt=rest_microservice_settings.COOKIE_SALT,
                                    expires=expires,
                                    httponly=True, samesite='strict', secure=not settings.DEBUG,
-                                   path="/jwt")
+                                   path=rest_microservice_settings.REFRESH_COOKIE_PATH)
         return response
 
     @staticmethod
@@ -58,8 +58,9 @@ class RefreshTokenUsingCookieMixin:
     @staticmethod
     def get_delete_cookie_response(status_code=status.HTTP_401_UNAUTHORIZED):
         response = Response(status=status_code)
-        response.delete_cookie('CSRF_token', path="/jwt")
-        response.delete_cookie(key=rest_microservice_settings.REFRESH_COOKIE_NAME, path="/jwt")
+        response.delete_cookie('CSRF_token', path=rest_microservice_settings.REFRESH_COOKIE_PATH)
+        response.delete_cookie(key=rest_microservice_settings.REFRESH_COOKIE_NAME,
+                               path=rest_microservice_settings.REFRESH_COOKIE_PATH)
         return response
 
     @staticmethod

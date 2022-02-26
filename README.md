@@ -42,6 +42,7 @@ the following:
 ```python
 REST_FRAMEWORK_MICROSERVICE = {
     "REFRESH_COOKIE_NAME": "refresh_cookie",
+    "REFRESH_COOKIE_PATH": "/auth",
     "IDP": {
         "PROVIDER": "aws",
         "USER_POOL": "us-west-2_abcdefg",
@@ -57,6 +58,13 @@ REST_FRAMEWORK_MICROSERVICE = {
 ``REFRESH_COOKIE_NAME``
 -----------------------
 Name of refresh cookie to set in HTTP header.
+
+
+``REFRESH_COOKIE_PATH``
+-----------------------
+URL path of refresh cookie, this should be a string that starts with a slash, ie: "/auth". This path 
+needs to match the path of authentication endpoint path set in urls.py.
+
 
 ``IDP``
 -----------------
