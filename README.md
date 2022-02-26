@@ -35,6 +35,74 @@ REST_FRAMEWORK = {
 }
 ```
 
+For log off / token black listing feature to work, you also need to include the following in django settings:
+```python
+INSTALLED_APPS = [
+    ...,
+    'rest_framework_simplejwt.token_blacklist'
+]
+```
+and then run django migrations.
+
+REST API endpoints
+==================
+
+``{{domain}}/auth/sign-in/``
+-------------------------
+Sign in directly against Django backend using username and password, retrieves access token and response body and 
+refresh token as HttpOnly cookie. The response body also contains a CSRF_token, which matches the same token set
+in the HttpOnly cookie.
+```commandline
+curl --location --request POST '127.0.0.1:8000/auth/sign-in/' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "username": "admin",
+    "password": "admin"
+}'
+```
+
+``{{domain}}/auth/social-exchange/``
+------------------------------------
+Submits JWT tokens from an IDP (AWS Cognito), and in exchange for JWT tokens issue by Django server.
+This will create a Django user if it does not already exist in the database. The response is the same as `sign-in`
+endpoint above.
+```commandline
+curl --location --request POST '127.0.0.1:8000/auth/social-exchange/' \
+--header 'Authorization: Bearer jwt_token_string \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "id_token": "id_token_from_idp",
+    "access_token": "access_token_from_idp",
+    "refresh_token": "refresh_token_from_idp",
+    "expires_in": 300,
+    "token_type": "Bearer"
+}'
+```
+
+``{{domain}}/auth/refresh/``
+----------------------------
+This endpoint accepts the refresh token and csrf token in HttpOnly cookies, and return an access token in response body.
+```commandline
+curl --location --request POST '127.0.0.1:8000/auth/refresh/' \
+--header 'Authorization: Bearer jwt_token_string \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "CSRF_token": "csrf_token"
+}'
+```
+
+``{{domain}}/auth/logoff/``
+This endpoint requires `rest_framework_simplejwt.token_blacklist` to have been installed.
+Call this endpoint to blacklist the current refresh token.
+```commandline
+curl --location --request POST '127.0.0.1:8000/auth/logoff/' \
+--header 'Authorization: Bearer jwt_token_string \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "CSRF_token": "csrf_token"
+}'
+```
+
 Settings
 ========
 Settings are specified in Django settings.py under `REST_FRAMEWORK_MICROSERVICE`, the defaults are
