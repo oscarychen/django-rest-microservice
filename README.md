@@ -92,6 +92,7 @@ curl --location --request POST '127.0.0.1:8000/auth/refresh/' \
 ```
 
 ``{{domain}}/auth/logoff/``
+--------------------------
 This endpoint requires `rest_framework_simplejwt.token_blacklist` to have been installed.
 Call this endpoint to blacklist the current refresh token.
 ```commandline
