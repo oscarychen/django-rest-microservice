@@ -217,3 +217,23 @@ SIMPLE_JWT = {
     'TOKEN_USER_CLASS': 'microservice.models.CustomTokenUser'
 }
 ```
+
+Third-party IDP
+===============
+This package currently supports Cognito as an identity provider.
+You can use AWS Cognito Userpool to enable social authentication.
+Screenshot below for an example of setting up Cognito with Google sign in.
+
+### AWS Cognito Userpool configurations
+![](docs/cognito_1.png)
+![](docs/cognito_2.png)
+![](docs/cognito_3.png)
+![](docs/cognito_4.png)
+![](docs/cognito_5.png)
+![](docs/cognito_6.png)
+![](docs/cognito_7.png)
+![](docs/cognito_8.png)
+### Google OAuth configurations
+![](docs/google_idp_1.png)
+![](docs/google_idp_2.png)
+![](docs/google_idp_3.png)
