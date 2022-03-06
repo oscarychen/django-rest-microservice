@@ -114,6 +114,7 @@ REST_FRAMEWORK_MICROSERVICE = {
     "REFRESH_COOKIE_PATH": "/auth",
     "IDP": {
         "PROVIDER": "aws",
+        "REGION": "us-west-2",
         "USER_POOL": "us-west-2_abcdefg",
         "CLIENT_ID": "abcdefg",
     },
@@ -140,6 +141,7 @@ needs to match the path of authentication endpoint path set in urls.py.
 A dictionary containing IDP attributes:
 - ``PROVIDER``: a string identifying what IDP backend to use, defaults to `'aws'` 
 (Currently only AWS Cognito is supported.)
+- ``REGION``: user pool region.
 - ``USER_POOL``: user pool identifier used with the IDP.
 - ``CLIENT_ID``: IDP client id for your application.
 

@@ -9,6 +9,7 @@ DEFAULTS = {
     "REFRESH_COOKIE_PATH": "/auth",
     "IDP": {
         "PROVIDER": "aws",
+        "REGION": "us-west-2",
         "USER_POOL": "us-west-2_abcdefg",
         "CLIENT_ID": "abcdefg",
     },

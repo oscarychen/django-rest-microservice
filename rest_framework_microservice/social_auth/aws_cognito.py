@@ -21,7 +21,7 @@ def get_pub_keys():
 
     if pub_keys is None:
         pub_keys = {key['kid']: json.dumps(key) for key in requests.get(
-        f"https://cognito-idp.us-west-2.amazonaws.com/{rest_microservice_settings.IDP['USER_POOL']}/.well-known/jwks.json").json().get('keys')}
+        f"https://cognito-idp.{rest_microservice_settings.IDP['REGION']}.amazonaws.com/{rest_microservice_settings.IDP['USER_POOL']}/.well-known/jwks.json").json().get('keys')}
         cache.set('cognito_pub_keys', pub_keys, 86000)
 
     return pub_keys
