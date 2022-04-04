@@ -15,7 +15,7 @@ from jwt import ExpiredSignatureError
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.response import Response
 from .social_auth.aws_cognito import decode_token
-
+from .models import Idp
 
 def add_custom_token_claims(token, user):
     """Append custom token claims specified using settings."""
@@ -145,15 +145,19 @@ class SocialLogInTokenExchangeSerializer(serializers.Serializer, SerializerRespo
         if id_token.get('email_verified') is False:
             raise APIException("Email not verified.")
 
+        user_defaults = {
+            "username": id_token["cognito:username"],
+            "first_name": id_token.get("given_name"),
+            "last_name": id_token.get("family_name"),
+        }
 
-        user, created = get_user_model().objects.get_or_create(
-            email=id_token["email"],
-            defaults={
-                "id": id_token['sub'],
-                "username": id_token["cognito:username"],
-                "first_name": id_token.get("given_name"),
-                "last_name": id_token.get("family_name"),
-            })
+        if rest_microservice_settings.USER_MODEL_UUID_FIELD is not None:
+            user_defaults[rest_microservice_settings.USER_MODEL_UUID_FIELD] = id_token['sub']
+
+        user, created = get_user_model().objects.get_or_create(email=id_token["email"], defaults=user_defaults)
+
+        if rest_microservice_settings.USER_MODEL_UUID_FIELD is None:
+            Idp.objects.update_or_create(user=user, defaults={"uuid": id_token['sub']})
 
         refresh = self.get_token(user)
         data = {

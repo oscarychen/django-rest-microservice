@@ -28,6 +28,12 @@ urlpatterns = [
 
 In Django settings, include the following:
 ```python
+
+INSTALLED_APPS = [
+    ...,
+    'rest_framework_microservice',
+]
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTTokenUserAuthentication',
@@ -122,6 +128,7 @@ REST_FRAMEWORK_MICROSERVICE = {
     "CUSTOM_TOKEN_CALLABLE_ATTRIBUTES": [],
     "COOKIE_SALT": "extra",
     "USER_SERIALIZER_CLASS": None,
+    "USER_MODEL_UUID_FIELD": None,
 }
 ```
 
@@ -169,6 +176,11 @@ Salt to be used when signing cookie.
 -------------------------
 Defaults to None. If specified, the default view serializers will try to add a user object representing the user.
 The content of the user object is defined by ``USER_SERIALIZER_CLASS``.
+
+``USER_MODEL_UUID_FIELD``
+-------------------------
+Defaults to None. Used to specify a field on the Django user model that can be used to store UUID from IDP.
+
 
 Customizing token claims
 ========================

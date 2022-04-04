@@ -14,12 +14,13 @@ settings.configure(
     INSTALLED_APPS=(
         'django.contrib.contenttypes',
         'django.contrib.auth',
-        'django_microservice',
+        'rest_framework_microservice',
     ),
+    SECRET_KEY="NA"
 )
 
 django.setup()
-call_command('makemigrations', )
+call_command('makemigrations', 'rest_framework_microservice')
 
 print('''
 Finished generating migrations.
