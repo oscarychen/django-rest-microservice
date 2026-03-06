@@ -1,3 +1,4 @@
+import datetime
 import jwt
 from jwt import DecodeError
 from jwt.algorithms import RSAAlgorithm
@@ -51,5 +52,6 @@ def decode_token(token, audience=None):
             key=public_key,
             verify=True,
             audience=audience,
-            algorithms=alg
+            algorithms=alg,
+            leeway=datetime.timedelta(seconds=10)
         )
